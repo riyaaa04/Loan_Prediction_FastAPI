@@ -12,10 +12,11 @@ model = pickle.load(open("build.pkl", "rb"))
 
 # Connect to MySQL
 db = mysql.connector.connect(
-    host=os.getenv("MYSQL_HOST", "mysql"),
-    user=os.getenv("MYSQL_USER", "root"),
-    password=os.getenv("MYSQL_PASSWORD", "root123"),
-    database=os.getenv("MYSQL_DATABASE", "loan_db")
+    host=os.getenv("DB_HOST"),
+    port=int(os.getenv("DB_PORT", 3306)),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
 )
 
 cursor = db.cursor()
