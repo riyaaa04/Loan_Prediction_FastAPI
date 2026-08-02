@@ -7,10 +7,14 @@ import os
 
 app = FastAPI()
 
-# Load model
+# -----------------------------
+# Load ML Model
+# -----------------------------
 model = pickle.load(open("build.pkl", "rb"))
 
+# -----------------------------
 # Connect to MySQL
+# -----------------------------
 db = mysql.connector.connect(
     host=os.getenv("DB_HOST"),
     port=int(os.getenv("DB_PORT", 3306)),
@@ -21,7 +25,9 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-# Input model
+# -----------------------------
+# Input Model
+# -----------------------------
 class LoanInput(BaseModel):
     Age: int
     Dependents: int
@@ -38,11 +44,17 @@ class LoanInput(BaseModel):
     Customer_Bandwith: int
 
 
+# -----------------------------
+# Home Route
+# -----------------------------
 @app.get("/")
 def home():
     return {"message": "Loan Prediction API is Running"}
 
 
+# -----------------------------
+# Prediction Route
+# -----------------------------
 @app.post("/predict")
 def predict(data: LoanInput):
 
@@ -106,7 +118,15 @@ def predict(data: LoanInput):
         result
     )
 
-    cursor.execute(sql, values)   
-    db.commit()
+    try:
+        if not db.is_connected():
+            db.reconnect()
+
+        cursor = db.cursor()
+        cursor.execute(sql, values)
+        db.commit()
+
+    except Exception as e:
+        print("Database Error:", e)
 
     return {"prediction": result}

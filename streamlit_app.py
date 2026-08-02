@@ -36,6 +36,8 @@ customer_bandwidth = {
     "Medium": 2
 }[customer_bandwidth]
 
+API_URL = "https://loan-prediction-fastapi-wzge.onrender.com/predict"
+
 if st.button("Predict"):
 
     data = {
@@ -54,9 +56,9 @@ if st.button("Predict"):
         "Customer_Bandwith": customer_bandwidth
     }
 
-    response = requests.post(
-        "http://backend:8000/predict",
-        json=data
-    )
+    response = requests.post(API_URL, json=data)
 
-    st.success(response.json()["prediction"])
+    if response.status_code == 200:
+        st.success(response.json()["prediction"])
+    else:
+        st.error(f"Error: {response.text}")
